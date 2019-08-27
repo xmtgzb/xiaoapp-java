@@ -14,6 +14,7 @@ import com.kzw.entity.UserEO;
 import com.kzw.util.FileUtil;
 import com.kzw.util.ImageUtil;
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.catalina.core.ApplicationPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -32,8 +35,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.List;
@@ -245,4 +250,55 @@ public class FileController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    //处理文件上传
+    @RequestMapping(value = "/uploadimg", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @ResponseBody
+    public String uploadImg(HttpServletRequest request) throws Exception {
+        //1.获取文件请求过来的图片
+        ApplicationPart image = (ApplicationPart) request.getPart("file");
+        //2.获得图片的输入流
+        InputStream in = image.getInputStream();
+        //3.获得项目路径
+        String webPath = SystemConstant.PHOTO_PATH;//request.getServletContext().getRealPath("/");
+        //4.获得文件路径
+        String path = webPath + "/imgupload/" + image.getSubmittedFileName();
+        //5.把文件流转成文件
+        inputstreamtofile(in, new File(path));
+        //6.文件名切割
+        String[] names = image.getSubmittedFileName().split(".");
+        //返回json
+        return names[0];
+    }
+
+    //InputStream,String,File相互转化
+    private void inputstreamtofile(InputStream ins, File file) {
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            int bytesRead = 0;
+            byte[] buffer = new byte[8192];
+            while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            System.out.println("inputstreamtofile");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (os != null) {
+                    os.close();
+                }
+                if (ins != null) {
+                    ins.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
