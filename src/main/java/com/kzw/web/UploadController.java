@@ -24,14 +24,15 @@ import java.util.List;
  * Created by majl on 2017/9/1.
  */
 @Controller
+@RequestMapping("/upload")
 public class UploadController {
     private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
-    @RequestMapping("/uploadimg")
+    @RequestMapping("/picture")
     public void uploadPicture(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         //获取文件需要上传到的路径
-        String path = request.getRealPath("C://upload") + "/";
+        String path = request.getRealPath("/upload") + "/";
         File dir = new File(path);
         if (!dir.exists()) {
             dir.mkdir();

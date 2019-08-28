@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
@@ -299,6 +301,27 @@ public class FileController {
             }
         }
     }
+    @RequestMapping(value = "/weChat/uploadImage", method = { RequestMethod.POST,RequestMethod.GET})
+    public ModelAndView uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("进入get方法！");
 
+        MultipartHttpServletRequest req =(MultipartHttpServletRequest)request;
+        MultipartFile multipartFile =  req.getFile("file");
+
+        String realPath = "C:/image";
+        try {
+            File dir = new File(realPath);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            File file  =  new File(realPath,"aaa.jpg");
+            multipartFile.transferTo(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
