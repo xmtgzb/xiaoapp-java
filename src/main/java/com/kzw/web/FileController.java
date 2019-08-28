@@ -252,7 +252,7 @@ public class FileController {
     }
 
     //处理文件上传
-    @RequestMapping(value = "/uploadimg", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @RequestMapping(value = "/uploadImg", method = RequestMethod.POST, consumes = "multipart/form-data" )
     @ResponseBody
     public String uploadImg(HttpServletRequest request) throws Exception {
         //1.获取文件请求过来的图片
