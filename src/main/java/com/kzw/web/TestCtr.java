@@ -41,16 +41,18 @@ public class TestCtr {
      * @return
      */
     @RequestMapping("/login")
-    //@ResponseBody
-    String home(HttpServletRequest request,UserEO user) {
+    @ResponseBody
+    String home(HttpServletRequest request) {
 
-//        try{
-//            userService.save(user);
-//        }catch (Exception e){
-//            log.error("登录出错",e);
-//            return "error";
-//        }
-        return "index";
+        try{
+            UserEO user = new UserEO("oCpAF5m9CLIVpTGYGLs18DJIEKug",null);
+            userService.save(user);
+            request.getSession().setAttribute("user",user);
+        }catch (Exception e){
+            log.error("登录出错",e);
+            return null;
+        }
+        return "oCpAF5m9CLIVpTGYGLs18DJIEKug";
     }
 
 /**
@@ -95,9 +97,10 @@ public class TestCtr {
      * @return
      */
     @RequestMapping("/loginout")
+    @ResponseBody
     public String loginOut(HttpServletRequest request) {
         request.getSession().invalidate();
-        return "redirect:/index.html";
+        return "注销成功";
     }
 
 

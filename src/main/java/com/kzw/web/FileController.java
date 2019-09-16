@@ -11,6 +11,8 @@ package com.kzw.web;
 import com.kzw.VO.Result;
 import com.kzw.constant.SystemConstant;
 import com.kzw.entity.UserEO;
+import com.kzw.entity.UserFileEO;
+import com.kzw.service.UserFileService;
 import com.kzw.util.FileUtil;
 import com.kzw.util.ImageUtil;
 import net.coobird.thumbnailator.Thumbnails;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 
@@ -62,143 +66,145 @@ public class FileController {
     public FileController(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
-    @RequestMapping(value = "/upload")
-    public String upload(HttpServletRequest request,@RequestParam("file") MultipartFile file) {
-        try {
-            if (file.isEmpty()) {
-                return "文件为空";
-            }
-
-            if (file.getSize()>20*1048576) {
-                return "文件过大超过20M";
-            }
-            UserEO user = (UserEO)request.getSession().getAttribute("user");
-            // 获取文件名
-            String fileName = file.getOriginalFilename();
-            log.info("上传的文件名为：" + fileName);
-            // 获取文件的后缀名
-            String suffixName = fileName.substring(fileName.lastIndexOf("."));
-            log.info("文件的后缀名为：" + suffixName);
-            // 设置文件存储路径
-            String filePath =getFilePath(user.getUserCode());
-            String path = filePath + fileName;
-            File dest = new File(path);
-            // 检测是否存在目录
-            if (!dest.getParentFile().exists()) {
-                dest.getParentFile().mkdirs();// 新建文件夹
-            }
-            file.transferTo(dest);// 文件写入
-            //将该文件夹下未生成缩略图的图片生成缩略图
-            ImageUtil.generateDirectoryThumbnail(filePath);
-            return "上传成功";
-        } catch (IllegalStateException e) {
-            log.error("上传失败",e);
-        } catch (IOException e) {
-            log.error("上传失败",e);
-        }
-        return "上传失败";
-    }
-
-    @PostMapping("/batch")
-    public String handleFileUpload(HttpServletRequest request) {
-        List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
-        MultipartFile file = null;
-        BufferedOutputStream stream = null;
-        UserEO user = (UserEO)request.getSession().getAttribute("user");
-        String filePath =getFilePath(user.getUserCode());
-        for (int i = 0; i < files.size(); ++i) {
-            file = files.get(i);
-            if (!file.isEmpty()) {
-                if (file.getSize()>20*1048576) {
-                    return "文件过大超过20M";
-                }
-                long maxSize =FileUtil.getFileSize(filePath)+file.getSize();
-                boolean isReturn = false;
-                String result = null;
-                switch (user.getVipFlag()){
-                    case "0":
-                        if (maxSize>20*1048576) {
-                            isReturn = true;
-                        }
-                        break;
-                    case "1":
-                        if (maxSize>20*1048576) {
-                            isReturn = true;
-                        }
-                        break;
-                }
-               if ( isReturn){
-                    return "您的空间不足，不允许上传";
-               }
-                try {
-                    byte[] bytes = file.getBytes();
-                    stream = new BufferedOutputStream(new FileOutputStream(
-                            new File(filePath + file.getOriginalFilename())));//设置文件路径及名字
-                    stream.write(bytes);// 写入
-                    stream.close();
-                    //生成缩略图
-                    Thumbnails.of(filePath)
-                               .scale(0.4f)
-                               .toFile(filePath+SystemConstant.PHOTO_THUM_PATH+file.getOriginalFilename());
-                } catch (Exception e) {
-                    stream = null;
-                    return "第 " + i + " 个文件上传失败 ==> "
-                            + e.getMessage();
-                }
-            } else {
-                return "第 " + i
-                        + " 个文件上传失败因为文件为空";
-            }
-        }
-        return "上传成功";
-    }
-
-    @GetMapping("/download")
-    public String downloadFile(HttpServletRequest request, HttpServletResponse response) {
-        String fileName = "dalaoyang.jpeg";// 文件名
-        if (fileName != null) {
-            //设置文件路径
-            File file = new File("/Users/dalaoyang/Documents/dalaoyang.jpeg");
-            //File file = new File(realPath , fileName);
-            if (file.exists()) {
-                response.setContentType("application/force-download");// 设置强制下载不打开
-                response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
-                byte[] buffer = new byte[1024];
-                FileInputStream fis = null;
-                BufferedInputStream bis = null;
-                try {
-                    fis = new FileInputStream(file);
-                    bis = new BufferedInputStream(fis);
-                    OutputStream os = response.getOutputStream();
-                    int i = bis.read(buffer);
-                    while (i != -1) {
-                        os.write(buffer, 0, i);
-                        i = bis.read(buffer);
-                    }
-                    return "下载成功";
-                } catch (Exception e) {
-                    log.error("上传失败",e);
-                } finally {
-                    if (bis != null) {
-                        try {
-                            bis.close();
-                        } catch (IOException e) {
-                            log.error("上传失败",e);
-                        }
-                    }
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException e) {
-                            log.error("上传失败",e);
-                        }
-                    }
-                }
-            }
-        }
-        return "下载失败";
-    }
-
+    @Autowired
+    public UserFileService userFileService;
+//    @RequestMapping(value = "/upload")
+//    public String upload(HttpServletRequest request,@RequestParam("file") MultipartFile file) {
+//        try {
+//            if (file.isEmpty()) {
+//                return "文件为空";
+//            }
+//
+//            if (file.getSize()>20*1048576) {
+//                return "文件过大超过20M";
+//            }
+//            UserEO user = (UserEO)request.getSession().getAttribute("user");
+//            // 获取文件名
+//            String fileName = file.getOriginalFilename();
+//            log.info("上传的文件名为：" + fileName);
+//            // 获取文件的后缀名
+//            String suffixName = fileName.substring(fileName.lastIndexOf("."));
+//            log.info("文件的后缀名为：" + suffixName);
+//            // 设置文件存储路径
+//            String filePath =getFilePath(user.getUserCode());
+//            String path = filePath + fileName;
+//            File dest = new File(path);
+//            // 检测是否存在目录
+//            if (!dest.getParentFile().exists()) {
+//                dest.getParentFile().mkdirs();// 新建文件夹
+//            }
+//            file.transferTo(dest);// 文件写入
+//            //将该文件夹下未生成缩略图的图片生成缩略图
+//            ImageUtil.generateDirectoryThumbnail(filePath);
+//            return "上传成功";
+//        } catch (IllegalStateException e) {
+//            log.error("上传失败",e);
+//        } catch (IOException e) {
+//            log.error("上传失败",e);
+//        }
+//        return "上传失败";
+//    }
+//
+//    @PostMapping("/batch")
+//    public String handleFileUpload(HttpServletRequest request) {
+//        List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
+//        MultipartFile file = null;
+//        BufferedOutputStream stream = null;
+//        UserEO user = (UserEO)request.getSession().getAttribute("user");
+//        String filePath =getFilePath(user.getUserCode());
+//        for (int i = 0; i < files.size(); ++i) {
+//            file = files.get(i);
+//            if (!file.isEmpty()) {
+//                if (file.getSize()>20*1048576) {
+//                    return "文件过大超过20M";
+//                }
+//                long maxSize =FileUtil.getFileSize(filePath)+file.getSize();
+//                boolean isReturn = false;
+//                String result = null;
+//                switch (user.getVipFlag()){
+//                    case "0":
+//                        if (maxSize>20*1048576) {
+//                            isReturn = true;
+//                        }
+//                        break;
+//                    case "1":
+//                        if (maxSize>20*1048576) {
+//                            isReturn = true;
+//                        }
+//                        break;
+//                }
+//               if ( isReturn){
+//                    return "您的空间不足，不允许上传";
+//               }
+//                try {
+//                    byte[] bytes = file.getBytes();
+//                    stream = new BufferedOutputStream(new FileOutputStream(
+//                            new File(filePath + file.getOriginalFilename())));//设置文件路径及名字
+//                    stream.write(bytes);// 写入
+//                    stream.close();
+//                    //生成缩略图
+//                    Thumbnails.of(filePath)
+//                               .scale(0.4f)
+//                               .toFile(filePath+SystemConstant.PHOTO_THUM_PATH+file.getOriginalFilename());
+//                } catch (Exception e) {
+//                    stream = null;
+//                    return "第 " + i + " 个文件上传失败 ==> "
+//                            + e.getMessage();
+//                }
+//            } else {
+//                return "第 " + i
+//                        + " 个文件上传失败因为文件为空";
+//            }
+//        }
+//        return "上传成功";
+//    }
+//
+//    @GetMapping("/download")
+//    public String downloadFile(HttpServletRequest request, HttpServletResponse response) {
+//        String fileName = "dalaoyang.jpeg";// 文件名
+//        if (fileName != null) {
+//            //设置文件路径
+//            File file = new File("/Users/dalaoyang/Documents/dalaoyang.jpeg");
+//            //File file = new File(realPath , fileName);
+//            if (file.exists()) {
+//                response.setContentType("application/force-download");// 设置强制下载不打开
+//                response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
+//                byte[] buffer = new byte[1024];
+//                FileInputStream fis = null;
+//                BufferedInputStream bis = null;
+//                try {
+//                    fis = new FileInputStream(file);
+//                    bis = new BufferedInputStream(fis);
+//                    OutputStream os = response.getOutputStream();
+//                    int i = bis.read(buffer);
+//                    while (i != -1) {
+//                        os.write(buffer, 0, i);
+//                        i = bis.read(buffer);
+//                    }
+//                    return "下载成功";
+//                } catch (Exception e) {
+//                    log.error("上传失败",e);
+//                } finally {
+//                    if (bis != null) {
+//                        try {
+//                            bis.close();
+//                        } catch (IOException e) {
+//                            log.error("上传失败",e);
+//                        }
+//                    }
+//                    if (fis != null) {
+//                        try {
+//                            fis.close();
+//                        } catch (IOException e) {
+//                            log.error("上传失败",e);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return "下载失败";
+//    }
+    @RequestMapping(value = "/getFileSize")
     public Result getFileSize(HttpServletRequest request){
         UserEO user = (UserEO)request.getSession().getAttribute("user");
         Double maxSize = new Double(FileUtil.getFileSize(getFilePath(user.getUserCode())));
@@ -253,75 +259,87 @@ public class FileController {
         }
     }
 
-    //处理文件上传
-    @RequestMapping(value = "/uploadImg", method = RequestMethod.POST, consumes = "multipart/form-data" )
-    @ResponseBody
-    public String uploadImg(HttpServletRequest request) throws Exception {
-        //1.获取文件请求过来的图片
-        ApplicationPart image = (ApplicationPart) request.getPart("file");
-        //2.获得图片的输入流
-        InputStream in = image.getInputStream();
-        //3.获得项目路径
-        String webPath = SystemConstant.PHOTO_PATH;//request.getServletContext().getRealPath("/");
-        //4.获得文件路径
-        String path = webPath + "/imgupload/" + image.getSubmittedFileName();
-        //5.把文件流转成文件
-        inputstreamtofile(in, new File(path));
-        //6.文件名切割
-        String[] names = image.getSubmittedFileName().split(".");
-        //返回json
-        return names[0];
-    }
 
-    //InputStream,String,File相互转化
-    private void inputstreamtofile(InputStream ins, File file) {
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(file);
-            int bytesRead = 0;
-            byte[] buffer = new byte[8192];
-            while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-            System.out.println("inputstreamtofile");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-                if (ins != null) {
-                    ins.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    @RequestMapping(value = "/weChat/uploadImage", method = { RequestMethod.POST,RequestMethod.GET})
-    public ModelAndView uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @RequestMapping(value = "/uploadOne", method = { RequestMethod.POST,RequestMethod.GET})
+    public Result uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         System.out.println("进入get方法！");
 
         MultipartHttpServletRequest req =(MultipartHttpServletRequest)request;
         MultipartFile multipartFile =  req.getFile("file");
-
-        String realPath = "C:/image";
         try {
+
+            UserEO user = (UserEO)request.getSession().getAttribute("user");
+            if(user==null){
+                return Result.error("请先登录！");
+            }
+            String realPath = SystemConstant.PHOTO_PATH+user.getUserCode()+"/";
+            String sltPath = realPath+SystemConstant.PHOTO_THUM_PATH;
             File dir = new File(realPath);
+            File dirThum = new File(sltPath);
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            File file  =  new File(realPath,"aaa.jpg");
-            multipartFile.transferTo(file);
+            if (!dirThum.exists()) {
+                dirThum.mkdir();
+            }
+            String fileName =(String)request.getSession().getAttribute("fileName");
+            String fileDesc =(String)request.getSession().getAttribute("fileDesc");
+            String isSee =(String)request.getSession().getAttribute("isSee");
+            if (StringUtils.isEmpty(isSee)){
+                isSee="0";
+            }
+            String xiangCe =(String)request.getSession().getAttribute("xiangCe");
+            if (StringUtils.isEmpty(fileName)){
+                fileName=new Date().getTime()+"";
+            }
+            File file  =  new File(realPath,fileName);
+//            File fileThum  =  new File(sltPath,fileName);
+            Result res=checkSize(multipartFile,user.getVipFlag(),realPath);
+            if(res.isError()){
+                return res;
+            }
+            multipartFile.transferTo(file);//真实图片
+            //生成缩略图片
+            ImageUtil.generateThumbnail2Directory(sltPath,sltPath+fileName);
+            UserFileEO userFile=new UserFileEO();
+            userFile.setFileDesc(fileDesc);//文件描述
+            userFile.setFileName(fileName);//文件名
+            userFile.setInsertTime(new Date());
+            userFile.setIsSee(isSee);//是否对外可见 1是，0否
+            userFile.setXiangCe(xiangCe);//相册
+            userFile.setRealPath(realPath);
+            userFile.setSltPath(sltPath);
+            userFile.setUserCode(user.getUserCode());
+            userFileService.save(userFile);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
-        return null;
+        return Result.ok("上传成功");
     }
-
+    private Result checkSize(MultipartFile multipartFile,String vipFlag,String realPath){
+    if (multipartFile.getSize()>20*1048576) {
+        return Result.error("文件过大超过20M");
+    }
+    long maxSize =FileUtil.getFileSize(realPath)+multipartFile.getSize();
+    boolean isReturn = false;
+    String result = null;
+    switch (vipFlag){
+        case "0":
+            if (maxSize>20*1048576) {
+                isReturn = true;
+            }
+            break;
+        case "1":
+            if (maxSize>20*1048576) {
+                isReturn = true;
+            }
+            break;
+    }
+    if ( isReturn){
+        return Result.error("您的空间不足，不允许上传");
+    }
+    return Result.ok();
+    }
 }

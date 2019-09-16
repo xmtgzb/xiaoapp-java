@@ -9,7 +9,7 @@ package com.kzw.constant;
  */
 public class SystemConstant {
     //图片地址
-    public static final String PHOTO_PATH="F://photo";// /photo
+    public static final String PHOTO_PATH="C://photo";// /photo
     //缩略图地址
     public static final String PHOTO_THUM_PATH="/thumbnail";
     //普通用户空间1G

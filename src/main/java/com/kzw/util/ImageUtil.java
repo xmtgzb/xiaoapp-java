@@ -24,7 +24,7 @@ public class ImageUtil {
     private static final double DEFAULT_SCALE = 0.25d;
 
     // 缩略图后缀
-    private static final String SUFFIX = "-thumbnail";
+    private static final String SUFFIX = "";
 
 
     /**

@@ -32,5 +32,11 @@ public class Result extends HashMap<String,Object>{
         super.put(key,value);
         return this;
     }
+    public  boolean isError(){
+        if (this.code.equals("200")){
+            return false;
+        }
+        return true;
+    }
 
 }
