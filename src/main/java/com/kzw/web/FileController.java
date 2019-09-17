@@ -268,7 +268,7 @@ public class FileController {
         MultipartFile multipartFile =  req.getFile("file");
         try {
 
-            String uniqueFlag =request.getHeader("uniqueFlag");
+            String uniqueFlag =(String)request.getSession().getAttribute("uniqueFlag");
             UserEO user =  SystemConstant.USER_MAP.get(uniqueFlag);
             if(user==null){
                 return Result.error("请先登录！");
