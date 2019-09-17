@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 图片压缩工具类
@@ -191,12 +192,7 @@ public class ImageUtil {
     }
     public static void main(String[] args) {
         try{
-//            String filePath="F:/photo/test.jpg";
-//            Thumbnails.of(filePath)
-//                    .scale(0.4f)
-//                    .toFile("F:/photo/sl/test.jpg");
-            String path = "F:/photo";
-            ImageUtil.generateDirectoryThumbnail(path);
+            System.out.println(UUID.randomUUID().toString());
         }catch (Exception e){
             e.printStackTrace();
         }

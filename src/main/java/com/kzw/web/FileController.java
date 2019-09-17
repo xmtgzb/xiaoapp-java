@@ -267,8 +267,8 @@ public class FileController {
         MultipartHttpServletRequest req =(MultipartHttpServletRequest)request;
         MultipartFile multipartFile =  req.getFile("file");
         try {
-
-            UserEO user = (UserEO)request.getSession().getAttribute("user");
+            String uniqueFlag =(String)request.getSession().getAttribute("uniqueFlag");
+            UserEO user =  SystemConstant.USER_MAP.get(uniqueFlag);
             if(user==null){
                 return Result.error("请先登录！");
             }

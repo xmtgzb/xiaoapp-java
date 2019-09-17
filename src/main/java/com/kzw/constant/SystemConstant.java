@@ -1,5 +1,10 @@
 package com.kzw.constant;
 
+import com.kzw.entity.UserEO;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author panaidong
  * @version V1.0
@@ -16,5 +21,7 @@ public class SystemConstant {
     public static final long MAX_SIZE=1024;//*1048576
     //VIP用户空间10G
     public static final long VIP_MAX_SIZE=10240*1048576;
+
+    public static Map<String,UserEO> USER_MAP =new HashMap<String,UserEO>();
 
 }

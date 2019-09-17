@@ -24,7 +24,15 @@ public class UserEO {
     private String userName;
     private String userCode;
     private String vipFlag;
+    private String uniqueFlag;
 
+    public String getUniqueFlag() {
+        return uniqueFlag;
+    }
+
+    public void setUniqueFlag(String uniqueFlag) {
+        this.uniqueFlag = uniqueFlag;
+    }
 
     public Long getId() {
         return id;

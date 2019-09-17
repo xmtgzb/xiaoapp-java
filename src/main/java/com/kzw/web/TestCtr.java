@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.kzw.TestApplication;
 
+import com.kzw.VO.Result;
 import com.kzw.VO.WeChatUserInfo;
 import com.kzw.client.HttpClientHelper;
 import com.kzw.constant.SystemConstant;
@@ -12,12 +13,10 @@ import com.kzw.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.core.io.ResourceLoader;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,17 +41,16 @@ public class TestCtr {
      */
     @RequestMapping("/login")
     @ResponseBody
-    String home(HttpServletRequest request) {
-
+    public Result home(HttpServletRequest request) {
+        UserEO user = new UserEO("oCpAF5m9CLIVpTGYGLs18DJIEKug",null);
         try{
-            UserEO user = new UserEO("oCpAF5m9CLIVpTGYGLs18DJIEKug",null);
             userService.save(user);
-            request.getSession().setAttribute("user",user);
+            SystemConstant.USER_MAP.put(user.getUniqueFlag(),user);
         }catch (Exception e){
             log.error("登录出错",e);
-            return null;
+            return Result.error("登录出错");
         }
-        return "oCpAF5m9CLIVpTGYGLs18DJIEKug";
+        return  Result.ok().put("user",user);
     }
 
 /**
@@ -64,8 +62,8 @@ public class TestCtr {
  **/
     @RequestMapping("/login_wx")
     @ResponseBody
-    public String loginSimple(HttpServletRequest request,String code) throws Exception {
-
+    public Result loginSimple(HttpServletRequest request,String code) throws Exception {
+        UserEO user =null;
         String url = new StringBuilder().append(WeChatUserInfo.loginUrl)
                 .append("appid="+ WeChatUserInfo.appid)
                 .append("&secret="+WeChatUserInfo.SECRET)
@@ -76,7 +74,7 @@ public class TestCtr {
         String result = HttpClientHelper.get(url);
         if(result == null ) {//请求失败
             log.error("请求失败！！！");
-            return null;
+            return Result.error("请求失败！！！");
         }
 
         JSONObject jsonObj = JSON.parseObject(result);
@@ -85,10 +83,11 @@ public class TestCtr {
         WeChatUserInfo weUser = new WeChatUserInfo();
         weUser.setOpenId(openId);
         if (!StringUtils.isEmpty(openId)){
-            userService.save(new UserEO(openId,null));
-            request.getSession().setAttribute("user",new UserEO(openId,null));
+            user =new UserEO(openId,null);
+            userService.save(user);
+            SystemConstant.USER_MAP.put(user.getUniqueFlag(),user);
         }
-        return openId;
+        return Result.ok().put("user",user);
     }
     /**
      * 注销登录

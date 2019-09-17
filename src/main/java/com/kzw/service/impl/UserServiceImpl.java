@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 /**
  * @author panaidong
  * @version V1.0
@@ -25,6 +27,7 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isEmpty(userCode)){
             UserEO oldUser= userRepo.getByCode(userCode);
             if (oldUser==null){
+                user.setUniqueFlag(UUID.randomUUID().toString());
                 userRepo.save(user);
             }
         }
