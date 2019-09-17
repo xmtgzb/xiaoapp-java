@@ -22,15 +22,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
     @Override
-    public void save(UserEO user) {
+    public UserEO save(UserEO user) {
         String userCode = user.getUserCode();
         if (!StringUtils.isEmpty(userCode)){
             UserEO oldUser= userRepo.getByCode(userCode);
             if (oldUser==null){
                 user.setUniqueFlag(UUID.randomUUID().toString());
                 userRepo.save(user);
+            }else{
+                user=oldUser;
             }
         }
-
+        return user;
     }
 }

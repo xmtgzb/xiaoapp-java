@@ -44,7 +44,7 @@ public class TestCtr {
     public Result home(HttpServletRequest request) {
         UserEO user = new UserEO("oCpAF5m9CLIVpTGYGLs18DJIEKug",null);
         try{
-            userService.save(user);
+            user=userService.save(user);
             SystemConstant.USER_MAP.put(user.getUniqueFlag(),user);
         }catch (Exception e){
             log.error("登录出错",e);
