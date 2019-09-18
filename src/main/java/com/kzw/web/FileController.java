@@ -22,6 +22,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -213,8 +214,8 @@ public class FileController {
     }
     @RequestMapping("/getDwFiles")
     @ResponseBody
-    public Result getDwFiles(HttpServletRequest request,String xiangCe){
-       List<UserFileEO> files= userFileService.getSeeSlts(xiangCe,"1");
+    public Result getDwFiles(HttpServletRequest request,@RequestBody UserFileEO userFile){
+       List<UserFileEO> files= userFileService.getSeeSlts(userFile.getXiangCe(),"1");
         return  Result.ok().put("files",files);
     }
     /**
