@@ -268,7 +268,7 @@ public class FileController {
         MultipartFile multipartFile =  req.getFile("file");
         try {
 
-            String uniqueFlag =(String)request.getSession().getAttribute("uniqueFlag");
+            String uniqueFlag =(String)request.getHeader("uniqueFlag");
             UserEO user =  SystemConstant.USER_MAP.get(uniqueFlag);
             if(user==null){
                 return Result.error("请先登录！");
@@ -283,16 +283,13 @@ public class FileController {
             if (!dirThum.exists()) {
                 dirThum.mkdir();
             }
-            String fileName =(String)request.getSession().getAttribute("fileName");
-            String fileDesc =(String)request.getSession().getAttribute("fileDesc");
-            String isSee =(String)request.getSession().getAttribute("isSee");
+            String fileName =new Date().getTime()+".jpg";
+            String fileDesc =(String)request.getParameter("fileDesc");
+            String isSee =(String)request.getParameter("isSee");
             if (StringUtils.isEmpty(isSee)){
                 isSee="0";
             }
-            String xiangCe =(String)request.getSession().getAttribute("xiangCe");
-            if (StringUtils.isEmpty(fileName)){
-                fileName=new Date().getTime()+"";
-            }
+            String xiangCe =(String)request.getParameter("xiangCe");
             File file  =  new File(realPath,fileName);
 //            File fileThum  =  new File(sltPath,fileName);
             Result res=checkSize(multipartFile,user.getVipFlag(),realPath);
@@ -312,10 +309,9 @@ public class FileController {
             userFile.setSltPath(sltPath);
             userFile.setUserCode(user.getUserCode());
             userFileService.save(userFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("图片上传失败",e);
+            return  Result.error("图片上传失败");
         }
         return Result.ok("上传成功");
     }

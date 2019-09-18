@@ -1,5 +1,6 @@
 package com.kzw.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,6 +20,7 @@ import java.util.Date;
 public class UserFileEO {
     private String userCode;
     private String fileName;
+    @Column(name="file_Desc")
     private String fileDesc;
     private String isSee;
     private String sltPath;
@@ -29,7 +31,12 @@ public class UserFileEO {
     private String xiangCe;
     private Date insertTime;
 
+    public Date getInsertTime() {
+        return insertTime;
+    }
+
     public UserFileEO() {
+
         this.isSee = "0";//不对外展示
     }
 
