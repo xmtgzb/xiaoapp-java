@@ -271,10 +271,10 @@ public class FileController {
             File dir = new File(realPath);
             File dirThum = new File(sltPath);
             if (!dir.exists()) {
-                dir.mkdir();
+                dir.mkdirs();
             }
             if (!dirThum.exists()) {
-                dirThum.mkdir();
+                dirThum.mkdirs();
             }
             String fileName =new Date().getTime()+".jpg";
             String fileDesc =(String)request.getParameter("fileDesc");
