@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 /**
@@ -25,6 +26,16 @@ public class UserFileEO {
     private String isSee;
     private String sltPath;
     private String realPath;
+    private String sltName;//缩略图文件名
+
+    public String getSltName() {
+        return sltName;
+    }
+
+    public void setSltName(String sltName) {
+        this.sltName = sltName;
+    }
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;

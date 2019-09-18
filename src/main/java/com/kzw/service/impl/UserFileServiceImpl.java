@@ -6,6 +6,8 @@ import com.kzw.service.UserFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author panaidong
  * @version V1.0
@@ -20,5 +22,11 @@ public class UserFileServiceImpl implements UserFileService{
     @Override
     public void save(UserFileEO userFileEO) {
         userFileRepo.save(userFileEO);
+    }
+
+    @Override
+    public List<UserFileEO> getSeeSlts(String xiangce, String isSee) {
+        List<UserFileEO> files = userFileRepo.getSeeSlts(xiangce, isSee);
+        return files;
     }
 }

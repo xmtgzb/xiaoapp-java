@@ -22,13 +22,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -37,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -214,7 +211,12 @@ public class FileController {
     private String getFilePath(String userCode){
        return userCode+"/"+ SystemConstant.PHOTO_PATH;
     }
-
+    @RequestMapping("/getDwFiles")
+    @ResponseBody
+    public Result getDwFiles(HttpServletRequest request,String xiangCe){
+       List<UserFileEO> files= userFileService.getSeeSlts(xiangCe,"1");
+        return  Result.ok().put("files",files);
+    }
     /**
      * show image 缩略图
      *
@@ -293,6 +295,7 @@ public class FileController {
             UserFileEO userFile=new UserFileEO();
             userFile.setFileDesc(fileDesc);//文件描述
             userFile.setFileName(fileName);//文件名
+            userFile.setSltName(fileName.substring(0,fileName.lastIndexOf("."))+"-thumbnail"+fileName.substring(fileName.lastIndexOf(".")));
             userFile.setInsertTime(new Date());
             userFile.setIsSee(isSee);//是否对外可见 1是，0否
             userFile.setXiangCe(xiangCe);//相册

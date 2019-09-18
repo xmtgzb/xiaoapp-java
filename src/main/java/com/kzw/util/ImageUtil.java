@@ -192,7 +192,8 @@ public class ImageUtil {
     }
     public static void main(String[] args) {
         try{
-            System.out.println(UUID.randomUUID().toString());
+            String str= "ooo.jpg";
+            System.out.println(str.substring(0,str.lastIndexOf("."))+"-thumbnail"+str.substring(str.lastIndexOf(".")));
         }catch (Exception e){
             e.printStackTrace();
         }
