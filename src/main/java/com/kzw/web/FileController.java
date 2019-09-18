@@ -15,13 +15,12 @@ import com.kzw.entity.UserFileEO;
 import com.kzw.service.UserFileService;
 import com.kzw.util.FileUtil;
 import com.kzw.util.ImageUtil;
-import net.coobird.thumbnailator.Thumbnails;
-import org.apache.catalina.core.ApplicationPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,22 +31,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -58,7 +47,7 @@ import java.util.List;
  * @email yangyang@dalaoyang.cn
  * @date 2018/4/9
  */
-@RestController
+@Controller
 public class FileController {
     private static final Logger log = LoggerFactory.getLogger(FileController.class);
     private final ResourceLoader resourceLoader;
@@ -205,6 +194,7 @@ public class FileController {
 //        return "下载失败";
 //    }
     @RequestMapping(value = "/getFileSize")
+    @ResponseBody
     public Result getFileSize(HttpServletRequest request){
         UserEO user = (UserEO)request.getSession().getAttribute("user");
         Double maxSize = new Double(FileUtil.getFileSize(getFilePath(user.getUserCode())));
@@ -261,6 +251,7 @@ public class FileController {
 
 
     @RequestMapping(value = "/uploadOne", method = { RequestMethod.POST,RequestMethod.GET})
+    @ResponseBody
     public Result uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         System.out.println("进入get方法！");
 
