@@ -289,7 +289,7 @@ public class FileController {
             }
             multipartFile.transferTo(file);//真实图片
             //生成缩略图片
-            ImageUtil.generateThumbnail2Directory(sltPath,sltPath+fileName);
+            ImageUtil.generateThumbnail2Directory(sltPath,realPath+fileName);
             UserFileEO userFile=new UserFileEO();
             userFile.setFileDesc(fileDesc);//文件描述
             userFile.setFileName(fileName);//文件名
