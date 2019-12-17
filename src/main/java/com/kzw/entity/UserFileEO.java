@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name="user_file")//表名称
-public class UserFileEO {
+public class UserFileEO implements Serializable {
     private String userCode;
     private String fileName;
     @Column(name="file_Desc")

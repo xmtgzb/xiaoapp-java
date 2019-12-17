@@ -1,16 +1,15 @@
 package com.kzw.Repo;
 
+import com.kzw.VO.BaseQueryVO;
 import com.kzw.entity.UserFileEO;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-@Repository
-public interface UserFileRepo extends BaseRepository<UserFileEO,Long>{
+public interface UserFileRepo {
 
-    @Query(value = "SELECT u FROM UserFileEO u WHERE u.isSee=:isSee and u.xiangCe=:xiangCe")
-    public List<UserFileEO> getSeeSlts(@Param(value="xiangCe")String xiangce,@Param(value="isSee")String isSee);
+     Page<UserFileEO> getSeeSlts(BaseQueryVO queryVo, Pageable page);
 
+    void save(UserFileEO userFileEO);
 }

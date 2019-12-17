@@ -8,6 +8,7 @@ package com.kzw.web;
  * @date
  */
 
+import com.kzw.VO.BaseQueryVO;
 import com.kzw.VO.Result;
 import com.kzw.constant.SystemConstant;
 import com.kzw.entity.UserEO;
@@ -19,6 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -213,9 +218,19 @@ public class FileController {
     }
     @RequestMapping("/getDwFiles")
     @ResponseBody
-    public Result getDwFiles(HttpServletRequest request,String xiangCe){
-       List<UserFileEO> files= userFileService.getSeeSlts(xiangCe,"1");
-        return  Result.ok().put("files",files);
+    public Result getDwFiles(HttpServletRequest request,BaseQueryVO queryVo){
+        int pageNum=0;
+        int pageSize=10;
+        if (queryVo.getPage()!=null){
+            pageNum=queryVo.getPage()-1;
+        }
+        if (queryVo.getPageSize()!=null){
+            pageSize=queryVo.getPageSize();
+        }
+        Sort sort = new Sort(Sort.Direction.DESC,"insertTime");
+        Pageable page = new PageRequest(pageNum,pageSize,sort);
+       Page<UserFileEO> pageList = userFileService.getSeeSlts(queryVo,page);
+        return  Result.ok().put("files",pageList);
     }
     /**
      * show image 缩略图

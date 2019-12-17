@@ -1,6 +1,9 @@
 package com.kzw.service;
 
+import com.kzw.VO.BaseQueryVO;
 import com.kzw.entity.UserFileEO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -8,10 +11,10 @@ public interface UserFileService {
     public void save(UserFileEO user);
 
     /**
-     * 根据相册获取对外可见的图片缩略图地址
-     * @param xiangce
-     * @param isSee
+     *
+     * @param queryVo
+     * @param page
      * @return
      */
-    public List<UserFileEO> getSeeSlts(String xiangce,String isSee);
+    public Page<UserFileEO> getSeeSlts(BaseQueryVO queryVo, Pageable page);
 }

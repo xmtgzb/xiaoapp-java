@@ -1,9 +1,14 @@
 package com.kzw.service.impl;
 
 import com.kzw.Repo.UserFileRepo;
+import com.kzw.VO.BaseQueryVO;
 import com.kzw.entity.UserFileEO;
 import com.kzw.service.UserFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +30,7 @@ public class UserFileServiceImpl implements UserFileService{
     }
 
     @Override
-    public List<UserFileEO> getSeeSlts(String xiangce, String isSee) {
-        List<UserFileEO> files = userFileRepo.getSeeSlts(xiangce, isSee);
-        return files;
+    public Page<UserFileEO> getSeeSlts(BaseQueryVO queryVo, Pageable page) {
+        return userFileRepo.getSeeSlts(queryVo,page);
     }
 }
