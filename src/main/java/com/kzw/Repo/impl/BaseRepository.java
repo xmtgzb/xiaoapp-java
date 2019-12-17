@@ -82,6 +82,7 @@ public class BaseRepository<E extends Serializable>{
                     map.entrySet()) {
                 query.setParameter(entry.getKey(),entry.getValue());
             }
+            query.setFirstResult(pageable.getPageNumber()).setMaxResults(pageable.getPageSize());
             List list = query.getResultList();
             return new PageImpl<E>(list,pageable,count);
         }
