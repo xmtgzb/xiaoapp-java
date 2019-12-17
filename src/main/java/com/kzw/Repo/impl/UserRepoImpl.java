@@ -19,7 +19,7 @@ import java.util.Map;
 public class UserRepoImpl extends BaseRepository<UserEO> implements UserRepo{
     @Override
     public UserEO getByCode(String userCode) {
-        String hql=" select * from UserEO where userCode=:userCode ";
+        String hql="  from UserEO where userCode=:userCode ";
         Map<String,Object> map= new HashMap<>();
         map.put("userCode",userCode);
         List<UserEO> list = (List<UserEO>)this.queryList(hql, map);
