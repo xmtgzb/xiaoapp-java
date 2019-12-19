@@ -33,6 +33,10 @@ public class UserFileRepoImpl extends BaseRepository<UserFileEO>implements UserF
             hql +=" and xiangCe=:xiangCe ";
             map.put("xiangCe",queryVo.getXiangCe());
         }
+        if (!StringUtils.isEmpty(queryVo.getUserCode())){
+            hql +=" and userCode=:userCode ";
+            map.put("userCode",queryVo.getUserCode());
+        }
         return this.queryPageList(hql,map,page);
     }
 }
