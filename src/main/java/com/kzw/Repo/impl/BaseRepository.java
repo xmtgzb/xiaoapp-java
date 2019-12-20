@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
@@ -35,17 +36,21 @@ public class BaseRepository<E extends Serializable>{
             }
         }
     }
+    @Transactional
     public void flush(){
             em.flush();
     }
+    @Transactional
     public void clear(){
         em.flush();
         em.clear();
     }
+    @Transactional
     public void detach(E entity){
         em.detach(entity);
     }
 
+    @Transactional
     public void save(E entity){
         if (!em.contains(entity)){
             em.merge(entity);
