@@ -225,7 +225,7 @@ public class FileController {
     }
     @RequestMapping("/getDwFiles")
     @ResponseBody
-    public Result getDwFiles(HttpServletRequest request,BaseQueryVO queryVo){
+    public Result getDwFiles(HttpServletRequest request,@RequestBody BaseQueryVO queryVo){
         int pageNum=0;
         int pageSize=10;
         if (queryVo.getPage()!=null){
