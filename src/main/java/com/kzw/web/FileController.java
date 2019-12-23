@@ -339,8 +339,7 @@ public class FileController {
         //获取文件需要上传到的路径
         String realPath = SystemConstant.PHOTO_PATH+user.getUserCode()+"/";
         String sltPath = realPath+SystemConstant.PHOTO_THUM_PATH;
-        String fileName =new Date().getTime()+".jpg";
-        File fileThum  =  new File(sltPath,fileName);
+
         String fileDesc =(String)request.getParameter("fileDesc");
         String isSee =(String)request.getParameter("isSee");
         if (StringUtils.isEmpty(isSee)){
@@ -355,9 +354,6 @@ public class FileController {
             dirThum.mkdirs();
         }
         String xiangCe =(String)request.getParameter("xiangCe");
-        ImageUtil.generateThumbnail2Directory(sltPath,realPath+fileName);
-        log.info("path=" + realPath);
-
         request.setCharacterEncoding("utf-8");  //设置编码
         //获得磁盘文件条目工厂
         DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -393,6 +389,9 @@ public class FileController {
 
             //自定义上传图片的名字为userId.jpg
 //            String fileName = request.getAttribute("userId") + ".jpg";
+            String fileName =new Date().getTime()+".jpg";
+            File fileThum  =  new File(sltPath,fileName);
+            ImageUtil.generateThumbnail2Directory(sltPath,realPath+fileName);
             String destPath = sltPath + fileName;
             log.info("destPath=" + destPath);
 
