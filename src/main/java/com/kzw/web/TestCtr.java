@@ -45,7 +45,7 @@ public class TestCtr {
         UserEO user = new UserEO("oCpAF5m9CLIVpTGYGLs18DJIEKug",null);
         try{
             user=userService.save(user);
-            SystemConstant.USER_MAP.put(user.getUniqueFlag(),user);
+            SystemConstant.USER_MAP.put(user.getUserCode(),user);
         }catch (Exception e){
             log.error("登录出错",e);
             return Result.error("登录出错");
@@ -85,7 +85,7 @@ public class TestCtr {
         if (!StringUtils.isEmpty(openId)){
             user =new UserEO(openId,null);
             userService.save(user);
-            SystemConstant.USER_MAP.put(user.getUniqueFlag(),user);
+            SystemConstant.USER_MAP.put(user.getUserCode(),user);
         }
         return Result.ok().put("user",user);
     }
