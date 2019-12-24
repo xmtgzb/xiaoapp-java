@@ -26,7 +26,7 @@ public class UserFileRepoImpl extends BaseRepository<UserFileEO>implements UserF
         String hql ="from UserFileEO where 1=1 ";
         Map<String,Object> map = new HashMap<>();
         if (!StringUtils.isEmpty(queryVo.getIsSee())){
-            hql +=" and isSee=;isSee ";
+            hql +=" and isSee=:isSee ";
             map.put("isSee",queryVo.getIsSee());
         }
         if (!StringUtils.isEmpty(queryVo.getXiangCe())){
