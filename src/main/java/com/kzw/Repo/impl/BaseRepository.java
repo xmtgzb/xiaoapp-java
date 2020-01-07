@@ -36,6 +36,9 @@ public class BaseRepository<E extends Serializable>{
             }
         }
     }
+    public E find(Object id){
+        return em.find(entityClass,id);
+    }
     @Transactional
     public void flush(){
             em.flush();
@@ -55,6 +58,14 @@ public class BaseRepository<E extends Serializable>{
         if (!em.contains(entity)){
             em.merge(entity);
         }
+    }
+    @Transactional
+    public void delete(E entity){
+        em.remove(em.contains(entity)?entity:em.merge(entity));
+    }
+    @Transactional
+    public void delete(Object id){
+        delete(find(id));
     }
  public List<?> queryList(String hql,Map<String,Object> map){
      Query query = em.createQuery(hql, entityClass);

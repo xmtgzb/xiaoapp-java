@@ -460,4 +460,13 @@ public class FileController {
     }
     return Result.ok();
     }
+
+    @RequestMapping("/delete")
+    @ResponseBody
+    public Result delete(HttpServletRequest request,@RequestBody BaseQueryVO queryVo){
+        if (StringUtils.isEmpty(queryVo.getUserCode())||StringUtils.isEmpty(queryVo.getId())){
+            return Result.error("userCode或id为空");
+        }
+        return Result.ok();
+    }
 }

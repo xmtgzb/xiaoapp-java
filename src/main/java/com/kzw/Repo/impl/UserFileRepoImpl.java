@@ -20,7 +20,7 @@ import java.util.Map;
  * @date
  */
 @Repository
-public class UserFileRepoImpl extends BaseRepository<UserFileEO>implements UserFileRepo{
+public class UserFileRepoImpl extends BaseRepository<UserFileEO> implements UserFileRepo{
     @Override
     public Page<UserFileEO> getSeeSlts(BaseQueryVO queryVo, Pageable page) {
         String hql ="from UserFileEO where 1=1 ";
@@ -39,5 +39,18 @@ public class UserFileRepoImpl extends BaseRepository<UserFileEO>implements UserF
             map.put("userCode",queryVo.getUserCode());
         }
         return this.queryPageList(hql,map,page);
+    }
+
+    @Override
+    public UserFileEO findOne(BaseQueryVO queryVo) {
+        String hql ="from UserFileEO where id=:id and userCode=:userCode ";
+        Map<String,Object> map = new HashMap<>();
+        map.put("id",queryVo.getId());
+        map.put("userCode",queryVo.getUserCode());
+        List<UserFileEO> list =(List<UserFileEO>)this.queryList(hql,map);
+        if (list==null||list.size()==0){
+            return null;
+        }
+        return list.get(0);
     }
 }

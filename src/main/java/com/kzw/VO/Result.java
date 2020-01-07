@@ -10,30 +10,41 @@ import java.util.HashMap;
  * @date
  */
 public class Result extends HashMap<String,Object>{
+    private static Result res;
+    private static  String success="200";
+    private static  String faile="500";
     private String code ;//200代表成功，其他代表失败
     private String msg ;
-    private Result(String code,String msg){
-        this.code=code;
-        this.msg=msg;
+    private static Result getResult(String code,String msg){
+        if (res==null){
+            Result r = new Result();
+            r.put("code",code);
+            r.put("msg",msg);
+            res =r;
+        }else{
+            res.put("code",code);
+            res.put("msg",msg);
+        }
+        return res;
     }
     public static Result ok(){
-        return new Result("200","");
+        return getResult(success,"");
     }
     public static Result ok(String msg){
-        return new Result("200",msg);
+        return  getResult(success,msg);
     }
     public static Result error(){
-        return new Result("500","系统错误，请联系管理员！！！");
+        return getResult(faile,"系统错误，请联系管理员！！！");
     }
     public static Result error(String msg){
-        return new Result("500",msg);
+        return getResult(faile,msg);
     }
     public Result put(String key,Object value){
         super.put(key,value);
         return this;
     }
     public  boolean isError(){
-        if (this.code.equals("200")){
+        if (success.equals(this.res.get("code"))){
             return false;
         }
         return true;

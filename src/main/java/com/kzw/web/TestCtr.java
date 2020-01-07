@@ -117,8 +117,8 @@ public class TestCtr {
     @ResponseBody
     public Result check(HttpServletRequest request) {
         CommonItemEO eo = itemService.getByCode("env_flag");
-        if (eo==null&&!"1".equals(eo.getValue())){
-            return Result.ok();
+        if (eo==null||!"1".equals(eo.getValue())){
+            return Result.ok().put("list",null);
         }
         List<TestVO> list = new ArrayList<>();
         TestVO vo =new TestVO();

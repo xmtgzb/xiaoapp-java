@@ -17,4 +17,12 @@ public interface UserFileService {
      * @return
      */
     public Page<UserFileEO> getSeeSlts(BaseQueryVO queryVo, Pageable page);
+
+    /**
+     *
+     * @param queryVo
+     */
+    void delete(BaseQueryVO queryVo);
+
+
 }

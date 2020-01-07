@@ -12,4 +12,11 @@ public interface UserFileRepo {
      Page<UserFileEO> getSeeSlts(BaseQueryVO queryVo, Pageable page);
 
     void save(UserFileEO userFileEO);
+
+    void delete(UserFileEO userFileEO);
+
+    UserFileEO find(Object id);
+
+    UserFileEO findOne(BaseQueryVO queryVo);
+
 }
