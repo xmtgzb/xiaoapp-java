@@ -467,6 +467,12 @@ public class FileController {
         if (StringUtils.isEmpty(queryVo.getUserCode())||StringUtils.isEmpty(queryVo.getId())){
             return Result.error("userCode或id为空");
         }
+        try {
+            userFileService.delete(queryVo);
+        }catch (Exception e){
+            log.error("删除失败",e);
+            return Result.error();
+        }
         return Result.ok();
     }
 }
